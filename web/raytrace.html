@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<body>
+<h1>HTML5 Canvas arc() Method</h1>
+
+
+<script>
+const canvas = document.createElement('canvas');
+const ctx = canvas.getContext('2d');
+canvas.width = 400; canvas.height = 400;
+document.body.appendChild(canvas);
+
+const imgData = ctx.createImageData(400, 400);
+const sphere = { center: [0, 0, -5], radius: 1 };
+
+for (let y = 0; y < 400; y++) {
+  for (let x = 0; x < 400; x++) {
+    // Map pixel (0 to 400) to screen coordinates (-1 to 1)
+    const px = (x - 200) / 200;
+    const py = (200 - y) / 200;
+    
+    // Ray direction (from camera at 0,0,0 towards screen)
+    const dir = [px, py, -1]; 
+    const hit = intersectSphere([0, 0, 0], dir, sphere);
+    
+    const i = (y * 400 + x) * 4;
+    imgData.data[i] = hit ? 255 : 0;     // Red channel
+    imgData.data[i+1] = 0;               // Green
+    imgData.data[i+2] = 0;               // Blue
+    imgData.data[i+3] = 255;             // Alpha
+  }
+}
+ctx.putImageData(imgData, 0, 0);
+
+function intersectSphere(origin, dir, s) {
+  const oc = [origin[0] - s.center[0], origin[1] - s.center[1], origin[2] - s.center[2]];
+  const b = 2 * (oc[0] * dir[0] + oc[1] * dir[1] + oc[2] * dir[2]);
+  const c = (oc[0]**2 + oc[1]**2 + oc[2]**2) - s.radius**2;
+  return (b * b - 4 * (dir[0]**2 + dir[1]**2 + dir[2]**2) * c) > 0;
+}
+
+</script>
+
+</body>
+</html>

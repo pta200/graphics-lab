@@ -1,0 +1,120 @@
+<!--
+To set the color of a specific pixel in an HTML5 Canvas, you must access the ImageData object through the 
+canvas context. The pixel data is stored in a one-dimensional Uint8ClampedArray where every four elements 
+represent one pixel's Red, Green, Blue, and Alpha (RGBA) values. 
+Steps to Modify a Single Pixel
+
+    Retrieve Image Data: Use context.getImageData(x, y, width, height) to get the data for a specific area or the entire canvas.
+    Calculate the Pixel Index: Since the array is one-dimensional, use the following formula to find the starting index for a pixel at coordinates (x, y):
+    index = (y * width + x) * 4
+    Modify RGBA Values: Update the four consecutive array elements starting at that index:
+        data[index] = Red (0–255)
+        data[index + 1] = Green (0–255)
+        data[index + 2] = Blue (0–255)
+        data[index + 3] = Alpha (0–255, where 255 is fully opaque)
+    Apply Changes: Use context.putImageData(imageData, dx, dy) to paint the modified data back onto the canvas. 
+
+
+    This function determines whether a ray (defined by an origin and a direction) intersects with a sphere. It is a classic piece of "Ray-Sphere Intersection" logic, commonly found in ray tracing or collision detection systems.
+
+The intersectSphere code uses the Quadratic Formula derived from the algebraic equation of a sphere.
+1. Breaking Down the Variables
+
+    origin: The starting 3D point (x,y,z) of the ray.
+
+    dir: The direction vector (x,y,z) the ray is traveling.
+
+    s: The sphere object, containing center (a 3D point) and radius.
+
+    oc: The "Offset Center." It represents the vector from the sphere's center to the ray's origin.
+
+2. The Math Behind the Code
+
+The intersection of a ray and a sphere is found by solving for t in the quadratic equation At2+Bt+C=0.
+
+    oc: This calculates L=O−C.
+
+    b: This represents the linear coefficient B. In vector math: B=2(D⋅L).
+
+    c: This represents the constant C. It is the squared distance from the origin to the center minus the squared radius: (L⋅L)−r2.
+
+    The Discriminant: The final line calculates the discriminant (B2−4AC).
+
+        The term (dir[0]**2 + dir[1]**2 + dir[2]**2) is A, which is the squared magnitude of the direction vector. (If the direction is normalized, A=1).
+
+3. The Result
+
+The function returns a Boolean (true/false).
+
+In standard geometry, if the discriminant is greater than 0, the ray hits the sphere in two places. If it's equal to 0, it grazes it (tangent). If it's 
+less than 0, it misses entirely.
+
+    Note on the -3: Interestingly, your code uses > -3 instead of the mathematically standard > 0.
+
+        If this is for a game or a rough simulation, this provides a "fuzzy" collision margin, effectively making the sphere feel slightly larger than its defined radius to account for floating-point errors.
+
+        If this is for a precise renderer, it should technically be > 0.
+
+Summary Table
+Line	Mathematical Purpose
+oc	Vector from sphere center to ray origin.
+b	B component (projection of direction onto the offset).
+c	C component (squared distance vs. squared radius).
+return	Checks if the Discriminant is high enough to constitute a "hit."
+
+-->
+
+
+<!DOCTYPE html>
+<html>
+<body>
+<h1>HTML5 Canvas arc() Method</h1>
+
+
+
+<script>
+const canvas = document.createElement('canvas');
+const ctx = canvas.getContext('2d');
+canvas.width = 800; canvas.height = 600;
+document.body.appendChild(canvas);
+
+const imgData = ctx.createImageData(canvas.width, canvas.height);
+const sphere1 = { center: [-1.0,0.0,-10.0], radius: 1.0 };
+const sphere2 = { center: [0.0,1.0,-10.0], radius: 1.25 };
+const sphere3 = { center: [1.0,0.0,-10.0], radius: 1.0 };
+const sphere4 = { center: [0.0,-1.0,-10.0], radius: 1.25 };
+
+for (let y = 0; y < canvas.height; y++) {
+  for (let x = 0; x < canvas.width; x++) {
+    // Map pixel (0 to 400) to screen coordinates (-1 to 1)
+    const px = (x - (canvas.width/2) ) / (canvas.width/2) ;
+    const py = ((canvas.height/2) - y) / (canvas.height/2) ;
+    
+    // Ray direction (from camera at 0,0,0 towards screen)
+    const dir = [px, py, -1]; 
+    const hit1 = intersectSphere([0, 0, 0], dir, sphere1);
+    const hit2 = intersectSphere([0, 0, 0], dir, sphere2);
+    const hit3 = intersectSphere([0, 0, 0], dir, sphere3);
+    const hit4 = intersectSphere([0, 0, 0], dir, sphere4);
+    
+    const i = (y * canvas.width + x) * 4;
+    imgData.data[i] = hit1 ? 255 : 0;     // Red channel
+    imgData.data[i+1] = hit2 ? 255 : 0;                // Green
+    imgData.data[i+2] = hit3 ? 255 : 0;                // Blue
+    imgData.data[i+3] = hit4 ? 100: 255         // Alpha
+  }
+}
+ctx.putImageData(imgData, 0, 0);
+
+
+function intersectSphere(origin, dir, s) {
+  const oc = [origin[0] - s.center[0], origin[1] - s.center[1], origin[2] - s.center[2]];
+  const b = 2 * (oc[0] * dir[0] + oc[1] * dir[1] + oc[2] * dir[2]);
+  const c = (oc[0]**2 + oc[1]**2 + oc[2]**2) - s.radius**2;
+  return (b * b - 4 * (dir[0]**2 + dir[1]**2 + dir[2]**2) * c) > 0;
+}
+
+</script>
+
+</body>
+</html>
