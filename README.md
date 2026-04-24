@@ -10,3 +10,6 @@ cd raytrace2d
 javac RayTraceFrame.java
 java RayTraceFrame
 ```
+
+![2d](2d.png)
+![3d](3d.png)

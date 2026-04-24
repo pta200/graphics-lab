@@ -279,7 +279,7 @@ public class RayTrace3DFrame extends JPanel
     }
 
     public static void main(String[] args) {
-        JFrame frame = new JFrame("Ray Trace");
+        JFrame frame = new JFrame("Ray Trace 3D");
         RayTrace3DFrame panel = new RayTrace3DFrame();
         frame.add(panel);
         frame.setSize(panel.width, panel.height); // Match your original applet size
